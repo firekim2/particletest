@@ -10,11 +10,11 @@ Then, install dependencies as follow:
 
 ```
 npm install
+npm install parcel --global
 ```
 
 You can use Parcel to run demo:
 
 ```
-npm install parcel --global
 parcel index.html
 ```
