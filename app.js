@@ -7,11 +7,9 @@ import * as dat from "dat.gui";
 import * as gsap from "gsap";
 
 import mask from './img/mask.png';
-import imposter from './img/a.jpeg';
-import nike from './img/b.jpeg';
+import t1 from './img/a.jpeg';
+import t2 from './img/b.jpeg';
 import gsapCore from 'gsap/gsap-core';
-
-const OrbitControls = require('three-orbit-controls')(THREE)
 
 export default class Sketch{
     constructor(){
@@ -19,18 +17,17 @@ export default class Sketch{
         this.camera.position.z = 500;
 
         this.scene = new THREE.Scene();
-        this.scene.background = new THREE.Color(0xffffff);
+        this.scene.background = new THREE.Color(0x000000);
 
         this.renderer = new THREE.WebGLRenderer( { antialias: true } );
         this.renderer.setSize( window.innerWidth, window.innerHeight );
         this.time = 0;
-        this.move = 0;
         this.inAnimate = false;
         this.index = 0;
 
         this.textures = [
-            new THREE.TextureLoader().load(imposter),
-            new THREE.TextureLoader().load(nike)
+            new THREE.TextureLoader().load(t1),
+            new THREE.TextureLoader().load(t2)
         ]
 
         this.mask = new THREE.TextureLoader().load(mask);
@@ -51,19 +48,13 @@ export default class Sketch{
         this.material.uniforms.time.value = this.time;
         this.camera.position.setX(30 * Math.sin(0.01 * this.time));
         this.camera.lookAt(0,0,0);
-        //this.material.uniforms.move.value = this.move;
         
         window.requestAnimationFrame(this.render.bind());
     }
 
     mouseEffect(){
-        this.renderer.domElement.addEventListener('wheel', (e) => {
-            this.move += e.deltaY / 10.0;
-        });
-
         this.renderer.domElement.addEventListener("click", (e) => {
             if(!this.inAnimate) {
-                console.log(this.index);
                 this.index = (++this.index) % this.textures.length;
                 this.material.uniforms.t.value = this.textures[this.index];
                 this.animateInsert();
@@ -86,7 +77,7 @@ export default class Sketch{
 
     animateOut(){
         gsapCore.to(this.material.uniforms.progress, {
-            duration : 1,
+            duration : 2,
             value: 0,
             ease: "Expo.easeOut"
         });
@@ -99,10 +90,8 @@ export default class Sketch{
             fragmentShader: fragment,
             vertexShader: vertex,
             uniforms: {
-                progress: {type: "f", value: 0},
                 t: {type: "t", value: this.textures[this.index]},
                 mask: {type: "t", value: this.mask},
-                move: {type: "f", value: 0},
                 time: {type: "f", value: 10.0},
                 progress: {type: "f", value: 0.0},
                 size: {type: "f", value: this.size}
@@ -119,13 +108,11 @@ export default class Sketch{
         this.positions = new THREE.BufferAttribute(new Float32Array(this.size * this.size * 3), 3);
         this.coordinate = new THREE.BufferAttribute(new Float32Array(this.size * this.size * 3), 3);
         this.speeds = new THREE.BufferAttribute(new Float32Array(this.size * this.size), 1);
-        this.offset = new THREE.BufferAttribute(new Float32Array(this.size * this.size), 1);
         let index = 0
         for (let i = 0 ; i < this.size; i++){
             for ( let j = 0 ; j < this.size ; j++){
                 this.positions.setXYZ(index, i - this.size / 2, j - this.size / 2, 0);
                 this.coordinate.setXYZ(index, i, j, 0);
-                this.offset.setX(index, rand(-1000, 1000));
                 this.speeds.setX(index, rand(0.4, 3));
                 index ++;
             }
@@ -137,7 +124,6 @@ export default class Sketch{
 
         this.geometry.setAttribute("position", this.positions);
         this.geometry.setAttribute("aCoordinates", this.coordinate);
-        this.geometry.setAttribute("aOffset", this.offset);
         this.geometry.setAttribute("aSpeed", this.speeds);
 
         this.mesh = new THREE.Points( this.geometry, this.material );

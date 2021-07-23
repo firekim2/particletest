@@ -4,14 +4,11 @@ varying vec4 vPosition;
 varying vec3 vPos;
 varying vec2 vCoordinates;
 
-uniform sampler2D t1;
-uniform sampler2D t2;
 uniform float size;
 uniform float move;
 uniform float progress;
 
 attribute float aSpeed;
-attribute float aOffset;
 attribute vec3 aCoordinates;
 
 void main(){
