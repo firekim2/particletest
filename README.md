@@ -18,3 +18,8 @@ You can use Parcel to run demo:
 ```
 parcel index.html
 ```
+
+Then, connect to localhost with port 1234
+```
+http://localhost:1234
+```
